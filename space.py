@@ -41,13 +41,13 @@ PLAYERS_LIST = (
 # list of backgrounds
 BACKGROUNDS_LIST = (
     #'assets/sprites/background-day.png',
-    'assets/sprites/background-test1.png',
+    'assets/sprites/Background-space.png',
 )
 
 # list of pipes
 PIPES_LIST = (
-    'assets/sprites/meteor1.png',
-    'assets/sprites/meteor1.png',
+    'assets/sprites/meteor.png',
+    'assets/sprites/meteor.png',
 )
 
 try:
@@ -78,10 +78,10 @@ def main():
     )
 
     # game over sprite
-    IMAGES['gameover'] = pygame.image.load('assets/sprites/game over (1).png').convert_alpha()
+    IMAGES['gameover'] = pygame.image.load('assets/sprites/game over.png').convert_alpha()
     # message sprite for welcome screen
-    IMAGES['message'] = pygame.image.load('assets/sprites/start1-.png').convert_alpha()
-    IMAGES['message1'] = pygame.image.load('assets/sprites/message1--.png').convert_alpha()
+    IMAGES['message'] = pygame.image.load('assets/sprites/start1.png').convert_alpha()
+    IMAGES['message1'] = pygame.image.load('assets/sprites/message1.png').convert_alpha()
     # base (ground) sprite
     IMAGES['base'] = pygame.image.load('assets/sprites/test.png').convert_alpha()
 
