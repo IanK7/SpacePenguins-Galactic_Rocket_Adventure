@@ -14,6 +14,7 @@ BASEY        = SCREENHEIGHT * 0.9
 IMAGES, SOUNDS, HITMASKS = {}, {}, {}
 
 
+
 # Sprites
 # list of all possible players (tuple of 3 positions of flap)
 PLAYERS_LIST = (
@@ -49,7 +50,6 @@ PIPES_LIST = (
     'assets/sprites/meteor1.png',
 )
 
-
 try:
     xrange
 except NameError:
@@ -63,24 +63,25 @@ def main():
     SCREEN = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
     pygame.display.set_caption('Flappy Bird')
 
-    # # numbers sprites for score display
-    # IMAGES['numbers'] = (
-    #     pygame.image.load('assets/sprites/0.png').convert_alpha(),
-    #     pygame.image.load('assets/sprites/1.png').convert_alpha(),
-    #     pygame.image.load('assets/sprites/2.png').convert_alpha(),
-    #     pygame.image.load('assets/sprites/3.png').convert_alpha(),
-    #     pygame.image.load('assets/sprites/4.png').convert_alpha(),
-    #     pygame.image.load('assets/sprites/5.png').convert_alpha(),
-    #     pygame.image.load('assets/sprites/6.png').convert_alpha(),
-    #     pygame.image.load('assets/sprites/7.png').convert_alpha(),
-    #     pygame.image.load('assets/sprites/8.png').convert_alpha(),
-    #     pygame.image.load('assets/sprites/9.png').convert_alpha()
-    # )
+    # numbers sprites for score display
+    IMAGES['numbers'] = (
+        pygame.image.load('assets/sprites/0.png').convert_alpha(),
+        pygame.image.load('assets/sprites/1.png').convert_alpha(),
+        pygame.image.load('assets/sprites/2.png').convert_alpha(),
+        pygame.image.load('assets/sprites/3.png').convert_alpha(),
+        pygame.image.load('assets/sprites/4.png').convert_alpha(),
+        pygame.image.load('assets/sprites/5.png').convert_alpha(),
+        pygame.image.load('assets/sprites/6.png').convert_alpha(),
+        pygame.image.load('assets/sprites/7.png').convert_alpha(),
+        pygame.image.load('assets/sprites/8.png').convert_alpha(),
+        pygame.image.load('assets/sprites/9.png').convert_alpha()
+    )
 
     # game over sprite
-    IMAGES['gameover'] = pygame.image.load('assets/sprites/gameover.png').convert_alpha()
+    IMAGES['gameover'] = pygame.image.load('assets/sprites/game over (1).png').convert_alpha()
     # message sprite for welcome screen
-    IMAGES['message'] = pygame.image.load('assets/sprites/message.png').convert_alpha()
+    IMAGES['message'] = pygame.image.load('assets/sprites/start1-.png').convert_alpha()
+    IMAGES['message1'] = pygame.image.load('assets/sprites/message1--.png').convert_alpha()
     # base (ground) sprite
     IMAGES['base'] = pygame.image.load('assets/sprites/test.png').convert_alpha()
 
@@ -145,7 +146,6 @@ def main():
 
 # Main Menu
 def showWelcomeAnimation():
-    """Shows welcome screen animation of flappy bird"""
     # index of player to blit on screen
     playerIndex = 0
     playerIndexGen = cycle([0, 1, 2, 1])
@@ -156,7 +156,10 @@ def showWelcomeAnimation():
     playery = int((SCREENHEIGHT - IMAGES['player'][0].get_height()) / 2)
 
     messagex = int((SCREENWIDTH - IMAGES['message'].get_width()) / 2)
-    messagey = int(SCREENHEIGHT * 0.12)
+    messagey = int(SCREENHEIGHT * -0.25)
+
+    messagea = int((SCREENWIDTH - IMAGES['message1'].get_width()) )
+    messageb = int(SCREENHEIGHT * 0.6)
 
     basex = 0
     # amount by which base can maximum shift to left
@@ -190,11 +193,32 @@ def showWelcomeAnimation():
         SCREEN.blit(IMAGES['background'], (0,0))
         SCREEN.blit(IMAGES['player'][playerIndex],(playerx, playery + playerShmVals['val']))
         SCREEN.blit(IMAGES['message'], (messagex, messagey))
+        SCREEN.blit(IMAGES['message1'], (messagea, messageb))
        # SCREEN.blit(IMAGES['base'], (basex, BASEY))
 
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
+    # def showWelcomeAnimation():
+    #     global game_stopped
+    #     start_image = pygame.image.load('assets/sprites/start.png')
+    #
+    #     while game_stopped:
+    #         quit_game()
+    #
+    #         # Draw Menu
+    #         window.fill((0, 0, 0))
+    #         window.blit(BACKGROUNDS_LIST, (0, 0))
+    #         window.blit(PLAYERS_LIST[0], (100, 250))
+    #         window.blit(start_image, (SCREENWIDTH // 2 - start_image.get_width() // 2,
+    #                                   SCREENHEIGHT // 2 - start_image.get_height() // 2))
+    #
+    #         # User Input
+    #         user_input = pygame.key.get_pressed()
+    #         if user_input[pygame.K_SPACE]:
+    #             main()
+    #
+    #         pygame.display.update()
 # game
 def mainGame(movementInfo):
     score = playerIndex = loopIter = 0
@@ -421,18 +445,18 @@ def getRandomPipe():
 
 
 def showScore(score):
-    """displays score in center of screen"""
+    """displays score in top left of screen"""
     scoreDigits = [int(x) for x in list(str(score))]
     totalWidth = 0 # total width of all numbers to be printed
 
-    # for digit in scoreDigits:
-    #     totalWidth += IMAGES['numbers'][digit].get_width()
+    for digit in scoreDigits:
+        totalWidth += IMAGES['numbers'][digit].get_width()
 
-    Xoffset = (SCREENWIDTH - totalWidth) / 2
+    Xoffset = 10 # start from the leftmost side of the screen
 
-    # for digit in scoreDigits:
-    #     SCREEN.blit(IMAGES['numbers'][digit], (Xoffset, SCREENHEIGHT * 0.1))
-    #     Xoffset += IMAGES['numbers'][digit].get_width()
+    for digit in scoreDigits:
+        SCREEN.blit(IMAGES['numbers'][digit], (Xoffset, 10))
+        Xoffset += IMAGES['numbers'][digit].get_width()
 
 
 def checkCrash(player, upperPipes, lowerPipes):
