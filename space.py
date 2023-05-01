@@ -12,8 +12,6 @@ PIPEGAPSIZE = 140
 BASEY = SCREENHEIGHT * 0.9
 IMAGES, SOUNDS, HITMASKS = {}, {}, {}
 
-
-
 # sprites
 PLAYERS_LIST = (
     # penguin sprites
@@ -52,12 +50,14 @@ try:
 except NameError:
     xrange = range
 
+
 # scroll background function
 def scrollBackground(background, x, y):
     rel_x = x % background.get_rect().width
     SCREEN.blit(background, (rel_x - background.get_rect().width, y))
     if rel_x < SCREENWIDTH:
         SCREEN.blit(background, (rel_x, y))
+
 
 # main function
 def main():
@@ -103,14 +103,14 @@ def main():
     # Start playing the background music
     pygame.mixer.music.play(loops=-1)
 
-    #Adjust the volume
+    # Adjust the volume
     pygame.mixer.music.set_volume(0.25)
 
-    SOUNDS['die']    = pygame.mixer.Sound('assets/audio/fail' + soundExt)
-    SOUNDS['hit']    = pygame.mixer.Sound('assets/audio/fail' + soundExt)
-    SOUNDS['point']  = pygame.mixer.Sound('assets/audio/success' + soundExt)
+    SOUNDS['die'] = pygame.mixer.Sound('assets/audio/fail' + soundExt)
+    SOUNDS['hit'] = pygame.mixer.Sound('assets/audio/fail' + soundExt)
+    SOUNDS['point'] = pygame.mixer.Sound('assets/audio/success' + soundExt)
     SOUNDS['swoosh'] = pygame.mixer.Sound('assets/audio/swoosh' + soundExt)
-    SOUNDS['wing']   = pygame.mixer.Sound('assets/audio/spaceship' + soundExt)
+    SOUNDS['wing'] = pygame.mixer.Sound('assets/audio/spaceship' + soundExt)
 
     while True:
         # select random background sprites
@@ -150,6 +150,7 @@ def main():
         crashInfo = mainGame(movementInfo)
         showGameOverScreen(crashInfo)
 
+
 # start menu
 def showStartAnimation():
     # index of player to blit on screen
@@ -164,7 +165,7 @@ def showStartAnimation():
     messagex = int((SCREENWIDTH - IMAGES['message'].get_width()) / 2)
     messagey = int(SCREENHEIGHT * -0.25)
 
-    messagea = int((SCREENWIDTH - IMAGES['message1'].get_width()) )
+    messagea = int((SCREENWIDTH - IMAGES['message1'].get_width()))
     messageb = int(SCREENHEIGHT * 0.6)
 
     basex = 0
@@ -196,8 +197,8 @@ def showStartAnimation():
         playerShm(playerShmVals)
 
         # draw sprites
-        SCREEN.blit(IMAGES['background'], (0,0))
-        SCREEN.blit(IMAGES['player'][playerIndex],(playerx, playery + playerShmVals['val']))
+        SCREEN.blit(IMAGES['background'], (0, 0))
+        SCREEN.blit(IMAGES['player'][playerIndex], (playerx, playery + playerShmVals['val']))
         SCREEN.blit(IMAGES['message'], (messagex, messagey))
         SCREEN.blit(IMAGES['message1'], (messagea, messageb))
 
@@ -230,18 +231,18 @@ def mainGame(movementInfo):
         {'x': SCREENWIDTH + 200 + (SCREENWIDTH / 2), 'y': newPipe2[1]['y']},
     ]
 
-    dt = FPSCLOCK.tick(FPS)/1000
+    dt = FPSCLOCK.tick(FPS) / 1000
     pipeVelX = -128 * dt
 
     # player velocity, max velocity, downward acceleration, acceleration on flap
-    playerVelY    =  -9
-    playerMaxVelY =  10
-    playerMinVelY =  -8
-    playerAccY    =   1
-    playerRot     =  50
-    playerVelRot  =   3
-    playerRotThr  =  20
-    playerFlapAcc =  -9
+    playerVelY = -9
+    playerMaxVelY = 10
+    playerMinVelY = -8
+    playerAccY = 1
+    playerRot = 50
+    playerVelRot = 3
+    playerRotThr = 20
+    playerFlapAcc = -9
     playerFlapped = False
     background_x = 0
     background_speed = 70 * dt
@@ -273,8 +274,6 @@ def mainGame(movementInfo):
                         if event.type == KEYDOWN and event.key == K_SPACE:
                             paused = not paused
                             break
-
-
 
         # scroll the background
         background_x -= background_speed
@@ -363,6 +362,7 @@ def mainGame(movementInfo):
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
+
 # game over function
 def showGameOverScreen(crashInfo):
     """crashes the player down and shows gameover image"""
@@ -407,7 +407,7 @@ def showGameOverScreen(crashInfo):
                 playerRot -= playerVelRot
 
         # draw sprites
-        SCREEN.blit(IMAGES['background'], (0,0))
+        SCREEN.blit(IMAGES['background'], (0, 0))
 
         for uPipe, lPipe in zip(upperPipes, lowerPipes):
             SCREEN.blit(IMAGES['pipe'][0], (uPipe['x'], uPipe['y']))
@@ -415,30 +415,27 @@ def showGameOverScreen(crashInfo):
 
         showScore(score)
 
-
-
-
         playerSurface = pygame.transform.rotate(IMAGES['player'][1], playerRot)
-        SCREEN.blit(playerSurface, (playerx,playery))
-        SCREEN.blit(IMAGES['gameover'], (SCREENWIDTH/2 - IMAGES['gameover'].get_width()/2, SCREENHEIGHT/2 - IMAGES['gameover'].get_height()/2))
+        SCREEN.blit(playerSurface, (playerx, playery))
+        SCREEN.blit(IMAGES['gameover'], (
+        SCREENWIDTH / 2 - IMAGES['gameover'].get_width() / 2, SCREENHEIGHT / 2 - IMAGES['gameover'].get_height() / 2))
 
         FPSCLOCK.tick(FPS)
         pygame.display.update()
 
+
 #
 def playerShm(playerShm):
-
     if abs(playerShm['val']) == 8:
         playerShm['dir'] *= -1
 
     if playerShm['dir'] == 1:
-         playerShm['val'] += 1
+        playerShm['val'] += 1
     else:
         playerShm['val'] -= 1
 
 
 def getRandomPipe():
-
     # y of gap between upper and lower pipe
     gapY = random.randrange(0, int(BASEY * 0.6 - PIPEGAPSIZE))
     gapY += int(BASEY * 0.2)
@@ -452,7 +449,6 @@ def getRandomPipe():
 
 
 def showScore(score):
-
     scoreDigits = [int(x) for x in list(str(score))]
     totalWidth = 0
 
@@ -467,7 +463,6 @@ def showScore(score):
 
 
 def checkCrash(player, upperPipes, lowerPipes):
-
     pi = player['index']
     player['w'] = IMAGES['player'][0].get_width()
     player['h'] = IMAGES['player'][0].get_height()
@@ -500,8 +495,8 @@ def checkCrash(player, upperPipes, lowerPipes):
 
     return [False, False]
 
-def pixelCollision(rect1, rect2, hitmask1, hitmask2):
 
+def pixelCollision(rect1, rect2, hitmask1, hitmask2):
     rect = rect1.clip(rect2)
 
     if rect.width == 0 or rect.height == 0:
@@ -512,18 +507,19 @@ def pixelCollision(rect1, rect2, hitmask1, hitmask2):
 
     for x in xrange(rect.width):
         for y in xrange(rect.height):
-            if hitmask1[x1+x][y1+y] and hitmask2[x2+x][y2+y]:
+            if hitmask1[x1 + x][y1 + y] and hitmask2[x2 + x][y2 + y]:
                 return True
     return False
 
-def getHitmask(image):
 
+def getHitmask(image):
     mask = []
     for x in xrange(image.get_width()):
         mask.append([])
         for y in xrange(image.get_height()):
-            mask[x].append(bool(image.get_at((x,y))[3]))
+            mask[x].append(bool(image.get_at((x, y))[3]))
     return mask
+
 
 if __name__ == '__main__':
     main()
