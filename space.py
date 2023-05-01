@@ -6,10 +6,10 @@ from pygame.locals import *
 
 # Constants
 FPS = 30
-SCREENWIDTH  = 800
+SCREENWIDTH = 800
 SCREENHEIGHT = 512
-PIPEGAPSIZE  = 140
-BASEY        = SCREENHEIGHT * 0.9
+PIPEGAPSIZE = 140
+BASEY = SCREENHEIGHT * 0.9
 IMAGES, SOUNDS, HITMASKS = {}, {}, {}
 
 
@@ -24,15 +24,15 @@ PLAYERS_LIST = (
     ),
 
     (
-        'assets/sprites/spacep.png',
-        'assets/sprites/spacepfire.png',
-        'assets/sprites/spacep.png',
+        'assets/sprites/spacepR.png',
+        'assets/sprites/spacepRfire.png',
+        'assets/sprites/spacepR.png',
     ),
 
     (
-        'assets/sprites/spacep.png',
-        'assets/sprites/spacepfire.png',
-        'assets/sprites/spacep.png',
+        'assets/sprites/spacepB.png',
+        'assets/sprites/spacepBfire.png',
+        'assets/sprites/spacepB.png',
     ),
 )
 
@@ -83,11 +83,13 @@ def main():
 
     # game over sprite
     IMAGES['gameover'] = pygame.image.load('assets/sprites/game over.png').convert_alpha()
+    # Pause Sprite
+    IMAGES['pause'] = pygame.image.load('assets/sprites/pause.png').convert_alpha()
     # message sprite for start screen
     IMAGES['message'] = pygame.image.load('assets/sprites/start1.png').convert_alpha()
     IMAGES['message1'] = pygame.image.load('assets/sprites/message1.png').convert_alpha()
     # base (ground) sprite
-    IMAGES['base'] = pygame.image.load('assets/sprites/test.png').convert_alpha()
+    IMAGES['base'] = pygame.image.load('assets/sprites/base.png').convert_alpha()
 
     # sounds
     if 'win' in sys.platform:
@@ -202,6 +204,7 @@ def showStartAnimation():
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
+
 # main game function
 def mainGame(movementInfo):
     score = playerIndex = loopIter = 0
@@ -242,6 +245,7 @@ def mainGame(movementInfo):
     playerFlapped = False
     background_x = 0
     background_speed = 70 * dt
+    paused = False
 
     # game loop
     while True:
@@ -254,6 +258,23 @@ def mainGame(movementInfo):
                     playerVelY = playerFlapAcc
                     playerFlapped = True
                     SOUNDS['wing'].play()
+            if event.type == KEYDOWN and event.key == K_b:
+                paused = not paused
+                # Display Pause when paused
+                if paused:
+                    SCREEN.blit(IMAGES['pause'], (195, 150))
+                    pygame.display.update()
+                    FPSCLOCK.tick(FPS)
+                while paused:
+                    for event in pygame.event.get():
+                        if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                            pygame.quit()
+                            sys.exit()
+                        if event.type == KEYDOWN and event.key == K_SPACE:
+                            paused = not paused
+                            break
+
+
 
         # scroll the background
         background_x -= background_speed
