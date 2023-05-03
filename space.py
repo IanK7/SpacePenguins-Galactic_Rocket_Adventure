@@ -3,6 +3,8 @@ import random
 import sys
 import pygame
 from pygame.locals import *
+from assets.classes.projectile import Projectile
+from assets.classes.boss import boss
 
 # Constants
 FPS = 30
@@ -159,6 +161,8 @@ def showStartAnimation():
     # iterator used to change playerIndex after every 5th iteration
     loopIter = 0
 
+    IMAGES['boss'] = pygame.image.load('assets/sprites/Boss_Example.png').convert_alpha()
+
     playerx = int(SCREENWIDTH * 0.2)
     playery = int((SCREENHEIGHT - IMAGES['player'][0].get_height()) / 2)
 
@@ -207,7 +211,7 @@ def showStartAnimation():
 
 
 # main game function
-def mainGame(movementInfo):
+def mainGame(movementInfo, player=None):
     score = playerIndex = loopIter = 0
     playerIndexGen = movementInfo['playerIndexGen']
     playerx, playery = int(SCREENWIDTH * 0.2), movementInfo['playery']
@@ -247,6 +251,10 @@ def mainGame(movementInfo):
     background_x = 0
     background_speed = 70 * dt
     paused = False
+    boss_group = pygame.sprite.Group()
+    projectile_group = pygame.sprite.Group()
+    boss_sprite = IMAGES['boss']
+    screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
 
     # game loop
     while True:
@@ -274,6 +282,30 @@ def mainGame(movementInfo):
                         if event.type == KEYDOWN and event.key == K_SPACE:
                             paused = not paused
                             break
+        if score == 1 and boss_sprite is IMAGES['boss']:
+            boss_sprite = boss(x = SCREENWIDTH, y = SCREENHEIGHT/10, screen  = screen)
+            boss_group.add(boss_sprite)
+            if event.type == KEYDOWN and event.key == K_SPACE:
+                if boss_sprite is not None:
+                    boss_sprite.shoot()
+                    projectile_group.add(boss_sprite.projectiles)
+        # Update game objects
+        boss_group.update()
+        projectile_group.update()
+
+        # Draw game objects
+        boss_group.draw(screen)
+        projectile_group.draw(screen)
+
+        # # Check if player collides with boss
+        # if pygame.sprite.spritecollide(player, boss_group, False):
+        #     # Handle collision
+        #     pass
+
+        # # Check if player collides with projectiles
+        # if pygame.sprite.spritecollide(player, projectile_group, False):
+        #     # Handle collision
+        #     pass
 
         # scroll the background
         background_x -= background_speed
