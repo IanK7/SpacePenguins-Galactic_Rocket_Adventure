@@ -4,61 +4,6 @@ import sys
 import pygame
 from pygame.locals import *
 
-class boss(pygame.sprite.Sprite):
-    def __init__(self, x, y, screen):
-        super().__init__()
-        self.image = pygame.image.load("Boss_Example.png")
-        self.image = pygame.transform.scale(self.image, (300, 200))
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-        self.screen = screen
-        self.attack_image = pygame.image.load("water_projectile-removebg-preview.png")
-        # self.attack_sound = pygame.mixer.Sound("attack_sound.wav")
-        # self.attack_sound.set_volume(0.5)
-        self.attack_delay = 120
-        self.attack_timer = 0
-        self.projectiles = pygame.sprite.Group()
-
-    def update(self):
-        # si cambio esto dispara mas rapido cada projectil
-        self.attack_timer -= 5
-        # Shoot projectile
-        if self.attack_timer <= 0:
-            self.attack_timer = self.attack_delay
-            # self.attack_sound.play()
-            projectile = Projectile(self.rect.centerx, self.rect.centery, self.attack_image)
-            self.projectiles.add(projectile)
-
-        # Update projectiles
-        self.projectiles.update()
-
-        # Draw projectiles
-        for projectile in self.projectiles:
-            projectile.draw(self.screen)
-
-    def shoot(self):
-        self.attack_timer = 0
-
-class Projectile(pygame.sprite.Sprite):
-    def __init__(self, x, y, image):
-        super().__init__()
-        self.image = image
-        self.rect = self.image.get_rect()
-        self.rect.centerx = x
-        self.rect.centery = y + 85
-        self.speed = 10
-
-    def update(self):
-        self.rect.x -= self.speed
-        if self.rect.top > 600:
-            self.kill()
-
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
-
-
-
 # Constants
 FPS = 30
 SCREENWIDTH = 800
@@ -146,6 +91,8 @@ def main():
     # base (ground) sprite
     IMAGES['base'] = pygame.image.load('assets/sprites/base.png').convert_alpha()
 
+
+
     # sounds
     if 'win' in sys.platform:
         soundExt = '.wav'
@@ -179,7 +126,6 @@ def main():
             pygame.image.load(PLAYERS_LIST[randPlayer][1]).convert_alpha(),
             pygame.image.load(PLAYERS_LIST[randPlayer][2]).convert_alpha(),
         )
-
         # select random pipe sprites
         pipeindex = random.randint(0, len(PIPES_LIST) - 1)
         IMAGES['pipe'] = (
@@ -257,6 +203,7 @@ def showStartAnimation():
         SCREEN.blit(IMAGES['message'], (messagex, messagey))
         SCREEN.blit(IMAGES['message1'], (messagea, messageb))
 
+
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
@@ -329,7 +276,7 @@ def mainGame(movementInfo):
                         if event.type == KEYDOWN and event.key == K_SPACE:
                             paused = not paused
                             break
-
+        
         # scroll the background
         background_x -= background_speed
         scrollBackground(IMAGES['background'], background_x, 0)
@@ -469,6 +416,7 @@ def showGameOverScreen(crashInfo):
             SCREEN.blit(IMAGES['pipe'][1], (lPipe['x'], lPipe['y']))
 
         showScore(score)
+        
 
         playerSurface = pygame.transform.rotate(IMAGES['player'][1], playerRot)
         SCREEN.blit(playerSurface, (playerx, playery))
@@ -515,6 +463,8 @@ def showScore(score):
     for digit in scoreDigits:
         SCREEN.blit(IMAGES['numbers'][digit], (Xoffset, 10))
         Xoffset += IMAGES['numbers'][digit].get_width()
+    
+    return score
 
 
 def checkCrash(player, upperPipes, lowerPipes):
