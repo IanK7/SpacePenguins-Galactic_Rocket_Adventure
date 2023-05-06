@@ -3,8 +3,7 @@ import random
 import sys
 import pygame
 from pygame.locals import *
-from assets.classes.projectile import Projectile
-from assets.classes.boss import boss
+
 
 # Constants
 FPS = 30
@@ -101,8 +100,8 @@ def main():
     IMAGES['life'] = pygame.transform.scale(IMAGES['life'], (60, 50))
 
     IMAGES['a'] = (
-        pygame.image.load('assets/sprites/power_shield.png'),
-        pygame.image.load('assets/sprites/squidpedo_00.png')
+        pygame.transform.scale(pygame.image.load('assets/sprites/power_shield.png'), (60, 50)),
+        pygame.transform.scale(pygame.image.load('assets/sprites/squidpedo_00.png'), (60, 50))
     )
 
     # sounds
@@ -159,6 +158,10 @@ def main():
             getHitmask(IMAGES['player'][1]),
             getHitmask(IMAGES['player'][2]),
         )
+        #gio
+        HITMASKS['powershield'] = (getHitmask(IMAGES['powershield']))
+        HITMASKS['life'] = (getHitmask(IMAGES['life']))
+        
 
         movementInfo = showStartAnimation()
         crashInfo = mainGame(movementInfo)
@@ -173,7 +176,6 @@ def showStartAnimation():
     # iterator used to change playerIndex after every 5th iteration
     loopIter = 0
 
-    IMAGES['boss'] = pygame.image.load('assets/sprites/Boss_Example.png').convert_alpha()
 
     playerx = int(SCREENWIDTH * 0.2)
     playery = int((SCREENHEIGHT - IMAGES['player'][0].get_height()) / 2)
@@ -269,9 +271,6 @@ def mainGame(movementInfo, player=None):
     background_x = 0
     background_speed = 70 * dt
     paused = False
-    boss_group = pygame.sprite.Group()
-    projectile_group = pygame.sprite.Group()
-    boss_sprite = IMAGES['boss']
     screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
 
     # game loop
@@ -300,30 +299,6 @@ def mainGame(movementInfo, player=None):
                         if event.type == KEYDOWN and event.key == K_SPACE:
                             paused = not paused
                             break
-        if score == 1 and boss_sprite is IMAGES['boss']:
-            boss_sprite = boss(x = SCREENWIDTH, y = SCREENHEIGHT/10, screen  = screen)
-            boss_group.add(boss_sprite)
-            if event.type == KEYDOWN and event.key == K_SPACE:
-                if boss_sprite is not None:
-                    boss_sprite.shoot()
-                    projectile_group.add(boss_sprite.projectiles)
-        # Update game objects
-        boss_group.update()
-        projectile_group.update()
-
-        # Draw game objects
-        boss_group.draw(screen)
-        projectile_group.draw(screen)
-
-        # # Check if player collides with boss
-        # if pygame.sprite.spritecollide(player, boss_group, False):
-        #     # Handle collision
-        #     pass
-
-        # # Check if player collides with projectiles
-        # if pygame.sprite.spritecollide(player, projectile_group, False):
-        #     # Handle collision
-        #     pass
 
         # scroll the background
         background_x -= background_speed
@@ -333,6 +308,11 @@ def mainGame(movementInfo, player=None):
         if background_x <= -IMAGES['background'].get_width():
             background_x = 0
 
+        #gio
+        powerUse = powerCrash({'x': playerx, 'y': playery, 'index': playerIndex}, powerups)
+
+        #print(usePowerUp(powerUse))
+        
         # check for crash here
         crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex},
                                upperPipes, lowerPipes)
@@ -395,7 +375,10 @@ def mainGame(movementInfo, player=None):
         if 3 > len(upperPipes) > 0 and 0 < upperPipes[0]['x'] < 5 and score % 5 == 0:
             newPowerUp = getRandomPowerup()
             powerups.append(newPowerUp[0])
-            print(powerups)
+        
+         # remove first pipe if its out of the screen
+        if len(powerups) > 1 and powerups[0]['x'] < -IMAGES['pipe'][0].get_width():
+            powerups.pop(0)
 
         # add new pipe when first pipe is about to touch left of screen
         if 3 > len(upperPipes) > 0 and 0 < upperPipes[0]['x'] < 5:
@@ -504,9 +487,9 @@ def playerShm(playerShm):
 
 #gio
 def getRandomPowerup():
-    
+    gapY = 0
     pos = random.randrange(0, len(IMAGES['a']))
-    gapY = 150
+    gapY = random.randrange(120, 130)
     powerUpHeight = IMAGES['a'][pos].get_height()
     powerUpX = SCREENWIDTH
 
@@ -515,8 +498,6 @@ def getRandomPowerup():
     elif pos == 1:
         return [{'x': powerUpX, 'y': gapY + powerUpHeight, 'type': 'life'}]
 
-def usePowerUp(player):
-    pass
 
 def getRandomPipe():
     # y of gap between upper and lower pipe
@@ -544,6 +525,41 @@ def showScore(score):
         SCREEN.blit(IMAGES['numbers'][digit], (Xoffset, 10))
         Xoffset += IMAGES['numbers'][digit].get_width()
 
+#gio
+def powerCrash(player, pipe):
+    pipe_dict = pipe[0]
+    pi = player['index']
+    player['w'] = IMAGES['player'][0].get_width()
+    player['h'] = IMAGES['player'][0].get_height()
+
+    playerRect = pygame.Rect(player['x'], player['y'], player['w'], player['h'])
+    pipeW = IMAGES[pipe_dict['type']].get_width()
+    pipeH = IMAGES[pipe_dict['type']].get_height()
+
+    # pipe rect
+    pipeRect = pygame.Rect(pipe[0]['x'], pipe[0]['y'], pipeW, pipeH)
+
+    # player and pipe hitmasks
+    pHitMask = HITMASKS['player'][pi]
+    pipeHitmask = HITMASKS[pipe_dict['type']]
+
+    # check if bird collided with pipe
+    pipeCollide = pixelCollision(playerRect, pipeRect, pHitMask, pipeHitmask)
+
+    if pipeCollide:
+        return [True, pipe_dict['type']] 
+
+    return [False]
+    
+def usePowerUp(resultado):
+    if resultado[0] == True:
+        if resultado[1] == 'powershield':
+            return 'a'
+        elif resultado[1] == 'life':
+            return 'c'
+        
+def powerdelet():
+    pass
 
 def checkCrash(player, upperPipes, lowerPipes):
     pi = player['index']
