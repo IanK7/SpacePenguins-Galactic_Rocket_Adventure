@@ -10,7 +10,7 @@ from assets.classes.boss import boss
 FPS = 30
 SCREENWIDTH = 800
 SCREENHEIGHT = 512
-PIPEGAPSIZE = 140
+PIPEGAPSIZE = 170
 BASEY = SCREENHEIGHT * 0.9
 IMAGES, SOUNDS, HITMASKS = {}, {}, {}
 
@@ -92,6 +92,18 @@ def main():
     IMAGES['message1'] = pygame.image.load('assets/sprites/message1.png').convert_alpha()
     # base (ground) sprite
     IMAGES['base'] = pygame.image.load('assets/sprites/base.png').convert_alpha()
+
+    #gio
+    #powerup sprites
+    IMAGES['powershield'] = pygame.image.load('assets/sprites/power_shield.png')
+    IMAGES['powershield'] = pygame.transform.scale(IMAGES['powershield'], (60, 50))
+    IMAGES['life'] = pygame.image.load('assets/sprites/squidpedo_00.png')
+    IMAGES['life'] = pygame.transform.scale(IMAGES['life'], (60, 50))
+
+    IMAGES['a'] = (
+        pygame.image.load('assets/sprites/power_shield.png'),
+        pygame.image.load('assets/sprites/squidpedo_00.png')
+    )
 
     # sounds
     if 'win' in sys.platform:
@@ -229,6 +241,12 @@ def mainGame(movementInfo, player=None):
         {'x': SCREENWIDTH + 10 + (SCREENWIDTH / 2), 'y': newPipe2[0]['y']},
     ]
 
+    #gio
+    newPowerUp = getRandomPowerup()
+    powerups = [
+        {'x': SCREENWIDTH, 'y': newPowerUp[0]['y'], 'type': newPowerUp[0]['type']} 
+    ]
+
     # list of lowerpipe
     lowerPipes = [
         {'x': SCREENWIDTH + 200, 'y': newPipe1[1]['y']},
@@ -329,6 +347,11 @@ def mainGame(movementInfo, player=None):
                 'playerVelY': playerVelY,
                 'playerRot': playerRot
             }
+        
+        #gio
+
+        
+
 
         # check for score
         playerMidPos = playerx + IMAGES['player'][0].get_width() / 2
@@ -365,6 +388,15 @@ def mainGame(movementInfo, player=None):
             uPipe['x'] += pipeVelX
             lPipe['x'] += pipeVelX
 
+        #gio
+        for p in powerups:
+            p['x'] += pipeVelX
+
+        if 3 > len(upperPipes) > 0 and 0 < upperPipes[0]['x'] < 5 and score % 5 == 0:
+            newPowerUp = getRandomPowerup()
+            powerups.append(newPowerUp[0])
+            print(powerups)
+
         # add new pipe when first pipe is about to touch left of screen
         if 3 > len(upperPipes) > 0 and 0 < upperPipes[0]['x'] < 5:
             newPipe = getRandomPipe()
@@ -379,6 +411,10 @@ def mainGame(movementInfo, player=None):
         for uPipe, lPipe in zip(upperPipes, lowerPipes):
             SCREEN.blit(IMAGES['pipe'][0], (uPipe['x'], uPipe['y']))
             SCREEN.blit(IMAGES['pipe'][1], (lPipe['x'], lPipe['y']))
+
+        #gio
+        for p in powerups:
+            SCREEN.blit(IMAGES[p['type']], (p['x'], p['y']))
 
         # print score so player overlaps the score
         showScore(score)
@@ -466,6 +502,21 @@ def playerShm(playerShm):
     else:
         playerShm['val'] -= 1
 
+#gio
+def getRandomPowerup():
+    
+    pos = random.randrange(0, len(IMAGES['a']))
+    gapY = 150
+    powerUpHeight = IMAGES['a'][pos].get_height()
+    powerUpX = SCREENWIDTH
+
+    if pos == 0:
+        return [{'x': powerUpX, 'y': gapY + powerUpHeight, 'type': 'powershield'}]
+    elif pos == 1:
+        return [{'x': powerUpX, 'y': gapY + powerUpHeight, 'type': 'life'}]
+
+def usePowerUp(player):
+    pass
 
 def getRandomPipe():
     # y of gap between upper and lower pipe
