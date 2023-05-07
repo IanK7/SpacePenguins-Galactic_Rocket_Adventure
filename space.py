@@ -99,6 +99,7 @@ def main():
     IMAGES['powershield'] = pygame.transform.scale(IMAGES['powershield'], (60, 50))
     IMAGES['life'] = pygame.image.load('assets/sprites/squidpedo_00.png')
     IMAGES['life'] = pygame.transform.scale(IMAGES['life'], (60, 50))
+    IMAGES['bubble_shield'] = pygame.transform.scale(pygame.image.load('assets/sprites/pwr_bubble_shield.png'), (128, 120))
 
     IMAGES['a'] = (
         pygame.transform.scale(pygame.image.load('assets/sprites/power_shield.png'), (60, 50)),
@@ -275,7 +276,8 @@ def mainGame(movementInfo, player=None):
     screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
     in_use = None
     start = 0
-    end = 0      
+    end = 0   
+    has_bubble_shield = False   
 
     # game loop
     while True:
@@ -315,15 +317,17 @@ def mainGame(movementInfo, player=None):
         #gio
         powerUse = powerCrash({'x': playerx, 'y': playery, 'index': playerIndex}, powerups)
         in_use = usePowerUp(powerUse, powerups, in_use)
-        print(in_use)
+        
         # check for crash here
         crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex}, upperPipes, lowerPipes)
         if in_use == 'shield':
             if end == 0:
                 start = score
-                end = start + 2
+                end = start + 3
+                has_bubble_shield = True
             if score >= end:
                 in_use = None
+                has_bubble_shield = False
                 start = 0
                 end = 0
         elif in_use == 'life':
@@ -410,6 +414,12 @@ def mainGame(movementInfo, player=None):
         #gio
         for p in powerups:
             SCREEN.blit(IMAGES[p['type']], (p['x'], p['y']))
+
+        bubble_width = IMAGES['bubble_shield'].get_width()
+        bubble_height = IMAGES['bubble_shield'].get_height()
+
+        if has_bubble_shield:
+            SCREEN.blit(IMAGES['bubble_shield'], (playerx, playery))
 
         # print score so player overlaps the score
         showScore(score)
