@@ -272,6 +272,7 @@ def mainGame(movementInfo, player=None):
     background_speed = 70 * dt
     paused = False
     screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
+    in_use = None
 
     # game loop
     while True:
@@ -310,13 +311,15 @@ def mainGame(movementInfo, player=None):
 
         #gio
         powerUse = powerCrash({'x': playerx, 'y': playery, 'index': playerIndex}, powerups)
-
-        #print(usePowerUp(powerUse))
+        usePowerUp(powerUse, powerups, in_use)
+        print(in_use)
+        
         
         # check for crash here
-        crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex},
-                               upperPipes, lowerPipes)
-        if crashTest[0]:
+        crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex}, upperPipes, lowerPipes)
+        if in_use == 'shield':
+            pass
+        elif crashTest[0]:
             return {
                 'y': playery,
                 'groundCrash': crashTest[1],
@@ -328,11 +331,6 @@ def mainGame(movementInfo, player=None):
                 'playerRot': playerRot
             }
         
-        #gio
-
-        
-
-
         # check for score
         playerMidPos = playerx + IMAGES['player'][0].get_width() / 2
         for pipe in upperPipes:
@@ -527,39 +525,43 @@ def showScore(score):
 
 #gio
 def powerCrash(player, pipe):
-    pipe_dict = pipe[0]
-    pi = player['index']
-    player['w'] = IMAGES['player'][0].get_width()
-    player['h'] = IMAGES['player'][0].get_height()
+    if pipe:
+        pipe_dict = pipe[0]
+        pi = player['index']
+        player['w'] = IMAGES['player'][0].get_width()
+        player['h'] = IMAGES['player'][0].get_height()
 
-    playerRect = pygame.Rect(player['x'], player['y'], player['w'], player['h'])
-    pipeW = IMAGES[pipe_dict['type']].get_width()
-    pipeH = IMAGES[pipe_dict['type']].get_height()
+        playerRect = pygame.Rect(player['x'], player['y'], player['w'], player['h'])
+        pipeW = IMAGES[pipe_dict['type']].get_width()
+        pipeH = IMAGES[pipe_dict['type']].get_height()
 
-    # pipe rect
-    pipeRect = pygame.Rect(pipe[0]['x'], pipe[0]['y'], pipeW, pipeH)
+        # pipe rect
+        pipeRect = pygame.Rect(pipe[0]['x'], pipe[0]['y'], pipeW, pipeH)
 
-    # player and pipe hitmasks
-    pHitMask = HITMASKS['player'][pi]
-    pipeHitmask = HITMASKS[pipe_dict['type']]
+        # player and pipe hitmasks
+        pHitMask = HITMASKS['player'][pi]
+        pipeHitmask = HITMASKS[pipe_dict['type']]
 
-    # check if bird collided with pipe
-    pipeCollide = pixelCollision(playerRect, pipeRect, pHitMask, pipeHitmask)
+        # check if bird collided with pipe
+        pipeCollide = pixelCollision(playerRect, pipeRect, pHitMask, pipeHitmask)
 
-    if pipeCollide:
-        return [True, pipe_dict['type']] 
-
-    return [False]
+        if pipeCollide:
+            return [True, pipe_dict['type'], pipeRect] 
+    else:
+        return [False]
     
-def usePowerUp(resultado):
-    if resultado[0] == True:
-        if resultado[1] == 'powershield':
-            return 'a'
-        elif resultado[1] == 'life':
-            return 'c'
-        
-def powerdelet():
-    pass
+def usePowerUp(resultado, powerups,in_use):
+    global inuse
+    if resultado:
+        if resultado[0] == True:
+            if resultado[1] == 'powershield':
+                powerups.pop(0)
+                in_use = 'shield'
+            elif resultado[1] == 'life':
+                powerups.pop(0)
+                in_use =  'life'
+
+    return in_use   
 
 def checkCrash(player, upperPipes, lowerPipes):
     pi = player['index']
