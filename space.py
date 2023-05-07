@@ -274,8 +274,8 @@ def mainGame(movementInfo, player=None):
     paused = False
     screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
     in_use = None
-    start_time = time.time()
-    duration = 30  # duración del contador en segundos      
+    start = 0
+    end = 0      
 
     # game loop
     while True:
@@ -314,17 +314,22 @@ def mainGame(movementInfo, player=None):
 
         #gio
         powerUse = powerCrash({'x': playerx, 'y': playery, 'index': playerIndex}, powerups)
-        usePowerUp(powerUse, powerups, in_use)
+        in_use = usePowerUp(powerUse, powerups, in_use)
         print(in_use)
-        
-        
         # check for crash here
         crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex}, upperPipes, lowerPipes)
         if in_use == 'shield':
-            start = score
-            in_use = 'shield'
-            
-        elif crashTest[0]:
+            if end == 0:
+                start = score
+                end = start + 2
+            if score >= end:
+                in_use = None
+                start = 0
+                end = 0
+        elif in_use == 'life':
+            score += 2
+            in_use = None
+        elif in_use == None and  crashTest[0]:
             return {
                 'y': playery,
                 'groundCrash': crashTest[1],
@@ -335,6 +340,10 @@ def mainGame(movementInfo, player=None):
                 'playerVelY': playerVelY,
                 'playerRot': playerRot
             }
+        elif score % 4 == 0:
+            in_use = None
+
+        
         
         # check for score
         playerMidPos = playerx + IMAGES['player'][0].get_width() / 2
@@ -556,7 +565,6 @@ def powerCrash(player, pipe):
         return [False]
     
 def usePowerUp(resultado, powerups,in_use):
-    global inuse
     if resultado:
         if resultado[0] == True:
             if resultado[1] == 'powershield':
@@ -565,7 +573,6 @@ def usePowerUp(resultado, powerups,in_use):
             elif resultado[1] == 'life':
                 powerups.pop(0)
                 in_use =  'life'
-
     return in_use   
 
 def checkCrash(player, upperPipes, lowerPipes):
