@@ -3,6 +3,7 @@ import random
 import sys
 import pygame
 from pygame.locals import *
+import time
 
 
 # Constants
@@ -273,6 +274,8 @@ def mainGame(movementInfo, player=None):
     paused = False
     screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
     in_use = None
+    start_time = time.time()
+    duration = 30  # duración del contador en segundos      
 
     # game loop
     while True:
@@ -318,7 +321,9 @@ def mainGame(movementInfo, player=None):
         # check for crash here
         crashTest = checkCrash({'x': playerx, 'y': playery, 'index': playerIndex}, upperPipes, lowerPipes)
         if in_use == 'shield':
-            pass
+            start = score
+            in_use = 'shield'
+            
         elif crashTest[0]:
             return {
                 'y': playery,
@@ -373,7 +378,7 @@ def mainGame(movementInfo, player=None):
         if 3 > len(upperPipes) > 0 and 0 < upperPipes[0]['x'] < 5 and score % 5 == 0:
             newPowerUp = getRandomPowerup()
             powerups.append(newPowerUp[0])
-        
+
          # remove first pipe if its out of the screen
         if len(powerups) > 1 and powerups[0]['x'] < -IMAGES['pipe'][0].get_width():
             powerups.pop(0)
